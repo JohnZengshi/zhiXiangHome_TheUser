@@ -1,0 +1,31 @@
+{
+  "pages": [
+    "pages/mine/main",
+    "pages/home/main"
+  ],
+  "window": {
+    "backgroundTextStyle": "light",
+    "navigationBarBackgroundColor": "#1EA3FF",
+    "navigationBarTitleText": "智享家",
+    "navigationBarTextStyle": "black"
+  },
+  "tabBar": {
+    "color": "#C5C5C7",
+    "selectedColor": "#4D3D33",
+    "backgroundColor": "#FFFFFF",
+    "borderStyle": "black",
+    "list": [{
+        "pagePath": "pages/home/main",
+        "text": "首页"
+      },
+      {
+        "pagePath": "pages/home/main",
+        "text": "工单"
+      },
+      {
+        "pagePath": "pages/mine/main",
+        "text": "我的"
+      }
+    ]
+  }
+}
