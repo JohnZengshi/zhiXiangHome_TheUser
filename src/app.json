@@ -1,7 +1,14 @@
 {
   "pages": [
+    "pages/home/main",
+    
     "pages/mine/main",
-    "pages/home/main"
+    "pages/mine/aboutUs/main",
+    "pages/mine/mineSetting/main",
+    "pages/mine/mineSetting/changePhone/main",
+    "pages/mine/mineSetting/addressManagement/main",
+    "pages/mine/mineSetting/addressManagement/addressDetail/main",
+    "pages/mine/mineSetting/addressManagement/addAddress/main"
   ],
   "window": {
     "backgroundTextStyle": "light",
@@ -16,15 +23,21 @@
     "borderStyle": "black",
     "list": [{
         "pagePath": "pages/home/main",
-        "text": "首页"
+        "text": "首页",
+        "iconPath": "static/images/mainPage/homePageUnSecected-icon.png",
+        "selectedIconPath": "static/images/mainPage/homePageSecected-icon.png"
       },
       {
         "pagePath": "pages/home/main",
-        "text": "工单"
+        "text": "工单",
+        "iconPath": "static/images/mainPage/orderSelectUnselect-icon.png",
+        "selectedIconPath": "static/images/mainPage/orderSelect-icon.png"
       },
       {
         "pagePath": "pages/mine/main",
-        "text": "我的"
+        "text": "我的",
+        "iconPath": "static/images/mainPage/mineUnSelect-icon.png",
+        "selectedIconPath": "static/images/mainPage/mineSelect-icon.png"
       }
     ]
   }
