@@ -35,7 +35,7 @@
           title: "联系电话",
           value: this.moniData.phone,
           placeholder: "请输入联系电话",
-          type: "number",
+          inputType: "number",
           model: "input",
         }, {
           key: "area",

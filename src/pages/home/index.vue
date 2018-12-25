@@ -6,16 +6,22 @@
     <div class="serviceList display_flex flex-direction_column align-items_center">
       <span class="title">请选择售后类型：</span>
       <ul>
-        <li>
-          <div class="item display_flex">
-            <div class="content display_flex align-items_center">
-              <img class="smallIcon" src="/static/images/homePage/maintenance-icon.png" alt="">
-              <span class="line"></span>
-              <span class="title">维修</span>
+        <navigator
+          url="/pages/home/createdOrder/main?type=1"
+          open-type="navigate"
+          hover-class="none">
+          <li>
+            <div class="item display_flex">
+              <div class="content display_flex align-items_center">
+                <img class="smallIcon" src="/static/images/homePage/maintenance-icon.png" alt="">
+                <span class="line"></span>
+                <span class="title">维修</span>
+              </div>
+              <img class="bigIcon" src="/static/images/homePage/maintenance-big-icon.png" alt="">
             </div>
-            <img class="bigIcon" src="/static/images/homePage/maintenance-big-icon.png" alt="">
-          </div>
-        </li>
+          </li>
+        </navigator>
+        
       </ul>
     </div>
   </div>
