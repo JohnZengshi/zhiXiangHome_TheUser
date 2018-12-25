@@ -16,7 +16,7 @@
           <picker
             class="text"
             v-else-if="item.model == 'select'"
-            mode="region"
+            :mode="item.selectMode"
             @change="bindRegionChange"
             @click="currentEdit = item.key"
             :value="region">
@@ -37,7 +37,6 @@
     data() {
       return {
           currentEdit: "",
-          // inputValue: "",
           region: "",
       }
     },
@@ -53,16 +52,13 @@
       InputItem
     },
     methods:{
-        // textInput(e){ //输入框输入
-        //     this.inputValue = e.target.value;
-        // },
         textblur(val) { //输入框完成输入
-          this.$emit('textInput', val, this.currentEdit);
+          this.$emit('textblur', val, this.currentEdit);
         },
         bindRegionChange(e){
             console.log(e)
             let val = e.target.value;
-            this.$emit('textInput',val,this.currentEdit);
+            this.$emit('textblur',val,this.currentEdit);
         }
     },
     mounted(){}
@@ -71,6 +67,7 @@
 
 <style lang="less" scoped>
   .detial {
+    width: 100%;
     background-color: #fff;
 
     >.title {

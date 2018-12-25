@@ -39,7 +39,12 @@
           </li>
       </ul>
     </div>
-    <button class="btn confirmBtn">新增地址</button>
+    <navigator
+      url="/pages/mine/mineSetting/addressManagement/addAddress/main"
+      open-type="navigate"
+      hover-class="none">
+      <button class="confirmBtn">新增地址</button>
+    </navigator>
   </div>
 </template>
 <script>
@@ -167,9 +172,8 @@
               }
           }
       }
-      >.btn{
+      .confirmBtn{
         width: 670rpx;
-        color: #fff;
         margin-top: 20rpx
       }
   }

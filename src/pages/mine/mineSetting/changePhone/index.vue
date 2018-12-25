@@ -9,7 +9,7 @@
         <input v-model="code" type="text" placeholder="请输入验证码" placeholder-class="placeholderClass001">
       </li>
     </ul>
-    <button @click="confirm" class="confirmBtn">提交</button>
+    <button @click="confirm" class="btn confirmBtn">提交</button>
   </div>
 </template>
 <script>
@@ -118,6 +118,9 @@
           width: 100%;
         }
       }
+    }
+    >.btn{
+      margin-top: 70rpx;
     }
   }
 </style>

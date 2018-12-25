@@ -1,25 +1,26 @@
 <template>
-  <div class="addressDetailPage">
+  <div class="addAddressPage display_flex flex-direction_column align-items_center .justify-content_flex-justify">
     <TableList 
-        :dataList="dataList"
-        @textblur="textblur"></TableList>
+      :dataList="dataList" 
+      @textblur="textblur"></TableList>
+      <button class="confirmBtn">保存地址</button>
   </div>
 </template>
 <script>
-  import TableList from "@/components/tableList";
+  import TableList from "@/components/tableList"
   export default {
+    components: {
+      TableList
+    },
     data() {
       return {
         moniData: {
-            userName:"老治安",
-            phone: "1234567890",
-            area: "广东深圳",
-            address: "德赛大厦"
+          userName: "",
+          phone: "",
+          area: "",
+          address: ""
         }
       }
-    },
-    components: {
-      TableList,
     },
     computed: {
       dataList() {
@@ -53,20 +54,26 @@
       }
     },
     methods: {
-      textblur(val,key){
-          let item = this.dataList.find((v)=>{
-              return v.key == key
-          });
-          if(key == 'area'){
-              this.moniData[item.key] =  val.join("");
-          }else{
-              this.moniData[item.key] =  val
-          }
+      textblur(val, key) {
+        let item = this.dataList.find((v) => {
+          return v.key == key
+        });
+        if (key == 'area') {
+          this.moniData[item.key] = val.join("");
+        } else {
+          this.moniData[item.key] = val
+        }
       }
     }
   }
 </script>
-
 <style lang="less" scoped>
-  .addressDetailPage {}
+.addAddressPage{
+  width: 100%;
+  height: 100%;
+  .confirmBtn{
+    width: 670rpx;
+    margin-bottom: 53rpx;
+  }
+}
 </style>
