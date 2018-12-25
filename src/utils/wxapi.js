@@ -469,6 +469,18 @@ const makePhoneCall = (phoneNumber) => new Promise((resolve,reject) => {
     }
   })
 })
+
+const setNavigationBarTitle = title => new Promise((resolve, reject) => {
+  wx.setNavigationBarTitle({
+    title: title,
+    success: function () {
+      resolve(true)
+    },
+    fail: function () {
+      reject(false)
+    }
+  })
+})
 export {
   getStorage,
   setStorage,
@@ -501,5 +513,6 @@ export {
   actionSheet,
   saveImage,
   checkSession,
-  makePhoneCall
+  makePhoneCall,
+  setNavigationBarTitle
 }

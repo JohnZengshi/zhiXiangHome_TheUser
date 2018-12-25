@@ -5,22 +5,42 @@
         @input="input"
         @blur="blur"
         :value="value"
-        :type="item.type?item.type:'text'" 
-        :placeholder="item.placeholder"
+        :type="inputType?inputType:'text'" 
+        :placeholder="placeholder"
+        :disabled="disabled"
         older-class="placeholderClass001">
 </template>
 <script>
   export default {
-      props:{
-          item:{
-              type: Object,
-          },
+      props: {
+        inputValue: {
+          type: String,
+        },
+        inputType: { //输入框类型
+          type: String,
+          deafult: () => {
+            return "text"
+          }
+        },
+        placeholder: { //placeholder
+          type: String,
+          deafult: () => {
+            return "请输入"
+          }
+        },
+        disabled: {
+          type: Boolean,
+          deafult: () => {
+            return false
+          }
+        }
       },
       data(){
           return {
               value:"",
           }
       },
+      watch: {},
       methods: {
         focus() {
           this.$emit('focus')
@@ -33,7 +53,7 @@
         }
       },
       mounted(){
-          this.value = this.item.value;
+          this.value = this.inputValue;
       }
   }
 </script>
