@@ -1,5 +1,6 @@
 {
   "pages": [
+    "pages/home/main",
     
     "pages/mine/main",
     "pages/mine/aboutUs/main",
@@ -7,9 +8,7 @@
     "pages/mine/mineSetting/changePhone/main",
     "pages/mine/mineSetting/addressManagement/main",
     "pages/mine/mineSetting/addressManagement/addressDetail/main",
-    "pages/mine/mineSetting/addressManagement/addAddress/main",
-    
-    "pages/home/main"
+    "pages/mine/mineSetting/addressManagement/addAddress/main"
   ],
   "window": {
     "backgroundTextStyle": "light",
