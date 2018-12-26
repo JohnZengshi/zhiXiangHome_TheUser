@@ -481,6 +481,31 @@ const setNavigationBarTitle = title => new Promise((resolve, reject) => {
     }
   })
 })
+
+const createSelectorQuery_fields = nodeName => new Promise((resolve, reject) => {
+  wx.createSelectorQuery().select(nodeName).fields({
+    dataset: true,
+    size: true,
+    scrollOffset: true,
+    rect: true,
+    properties: [],
+    computedStyle: [],
+    context: true,
+  }, function (res) {
+    res.dataset // 节点的dataset
+    res.width // 节点的宽度
+    res.height // 节点的高度
+    res.scrollLeft // 节点的水平滚动位置
+    res.scrollTop // 节点的竖直滚动位置
+    res.scrollX // 节点 scroll-x 属性的当前值
+    res.scrollY // 节点 scroll-y 属性的当前值
+    // 此处返回指定要返回的样式名
+    res.margin
+    res.backgroundColor
+    res.context // 节点对应的 Context 对象
+    resolve(res);
+  }).exec()
+})
 export {
   getStorage,
   setStorage,
@@ -514,5 +539,6 @@ export {
   saveImage,
   checkSession,
   makePhoneCall,
-  setNavigationBarTitle
+  setNavigationBarTitle,
+  createSelectorQuery_fields,
 }

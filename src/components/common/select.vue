@@ -19,6 +19,7 @@
         </ul>
         <div class="btn display_flex">
             <button  @click.stop="cancel">取消</button>
+            <button  @click.stop="confirm" class="confirm" v-if="selectPopupData.hasConfirmBtn">确定</button>
         </div>
     </div>
 </template>
@@ -32,6 +33,7 @@
             title: "这是一个选择弹窗", //弹窗标题
             key: "a", //选中的key值
             label: "b", //显示的值
+            hasConfirmBtn: false,
             selectList: [{ //选中列表
               a: "",
               b: "",
@@ -124,6 +126,10 @@
       font-family: PingFangSC-Regular;
       font-weight: 400;
       color: rgba(77, 61, 51, 1);
+      &.confirm{
+        color: #fff;
+        background-color: @baseColor;
+      }
     }
   }
 }

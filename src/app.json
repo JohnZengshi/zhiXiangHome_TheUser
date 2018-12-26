@@ -3,6 +3,11 @@
     "pages/home/main",
     "pages/home/createdOrder/main",
 
+    "pages/order/main",
+    "pages/order/orderDetail/main",
+    "pages/order/evaluation/main",
+    
+
     "pages/mine/main",
     "pages/mine/aboutUs/main",
     "pages/mine/mineSetting/main",
@@ -29,7 +34,7 @@
         "selectedIconPath": "static/images/mainPage/homePageSecected-icon.png"
       },
       {
-        "pagePath": "pages/home/main",
+        "pagePath": "pages/order/main",
         "text": "工单",
         "iconPath": "static/images/mainPage/orderSelectUnselect-icon.png",
         "selectedIconPath": "static/images/mainPage/orderSelect-icon.png"
