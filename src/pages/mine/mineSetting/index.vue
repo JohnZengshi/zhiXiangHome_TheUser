@@ -9,10 +9,10 @@
           </div>
         </li>
       </navigator>
-      <navigator url="/pages/mine/mineSetting/changePhone/main">
+      <navigator url="/pages/mine/mineSetting/bindPhone/main?type=changePhone">
         <li>
           <div class="display_flex justify-content_flex-justify align-items_center">
-            <span>绑定手机号</span>
+            <span>更换手机号</span>
             <img src="/static/images/mainPage/arrows.png" alt="">
           </div>
         </li>

@@ -19,10 +19,22 @@
   </div>
 </template>
 <script>
+  import {
+    mapState
+  } from "vuex";
   import TableList from "@/components/tableList";
   import SelectBox from "@/components/select";
-  import {toast,navigateBack} from "@/utils/wxapi";
-  import {RegExpr} from "@/utils/regex";
+  import {
+    getOneRegions,
+    updateUserAddress
+  } from "@/network/api";
+  import {
+    toast,
+    navigateBack
+  } from "@/utils/wxapi";
+  import {
+    RegExpr
+  } from "@/utils/regex";
   export default {
     data() {
       return {
@@ -31,6 +43,7 @@
             phone: "",
             area: "",
             address: "",
+            addressID: "",
             isdefault: false
         },
         initMoniData: {
@@ -46,6 +59,9 @@
       SelectBox
     },
     computed: {
+      ...mapState({
+        cityList: state => state.regions.list //城市列表
+      }),
       dataList() {
         return [{
           key: "userName",
@@ -123,6 +139,15 @@
             this.$set(this.moniData, 'isdefault', false);
           }
         }
+      },
+      updateUserAddressParams() { //地址列表请求参数
+        return {
+          openid: this.globalData.openId,
+          name: this.moniData.userName,
+          phone: this.moniData.phone,
+          region_id: this.moniData.addressID,
+          address: this.moniData.address,
+        }
       }
     },
     methods: {
@@ -131,10 +156,35 @@
               return v.key == key
           });
           if(key == 'area'){
+              ;(async()=>{
+                let addressID =await this.getFinalRegions(val)
+                this.moniData.addressID = addressID;
+              })()
               this.moniData[item.key] =  val.join("");
           }else{
               this.moniData[item.key] =  val
           }
+      },
+      getFinalRegions(valList) {
+        // valList.forEach(async (val) => {})//forEach不会阻塞循环,不能用
+        return (async () => {
+          let cityList = this.cityList;
+          let parent_id;
+          let parent_idList = [];
+          for (let i = 0; i < valList.length; i++) {
+            let item = cityList.find((v) => {
+              return v.region_name == valList[i]
+            });
+            parent_id = item.region_id;
+            parent_idList.push(parent_id);
+            let getOneRegionsRES = await getOneRegions({
+              parent_id
+            });
+            cityList = getOneRegionsRES.list;
+            console.log(parent_idList);
+          };
+          return parent_idList[parent_idList.length - 1]
+        })()
       },
       confirmBtn() { //保存按钮
         const toastFun = (key) => {
@@ -156,10 +206,17 @@
           toastFun('address')
         } else {
           console.log("输入无误",this.moniData)
-          ;(async()=>{
-            let res = await toast("保存成功",500)
-            if(res == 'ok'){
-              navigateBack();
+          ;
+          (async () => {
+            let updateUserAddressRES = await updateUserAddress(this.updateUserAddressParams);
+            if (updateUserAddressRES.errCode == 0) {
+              let res = await toast(updateUserAddressRES.msg, 500)
+              console.log(res)
+              if (res) {
+                navigateBack();
+              }
+            } else {
+              toast(updateUserAddressRES.errMsg);
             }
           })()
         }
@@ -167,6 +224,9 @@
       },
     },
     onLoad(option) {},
+    onShow() {
+      console.log(this.cityList)
+    },
     mounted() {},
     onUnload() {},
   }

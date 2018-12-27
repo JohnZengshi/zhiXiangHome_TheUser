@@ -60,6 +60,11 @@
             toast("手机号输入不正确")
           }
         } 
+      },
+      resetSendCode() { //重置按钮
+        this.initTime = 60;
+        this.time = 60;
+        this.timekeeping = false;
       }
     }
   }

@@ -51,11 +51,19 @@
   </div>
 </template>
 <script>
+  import {
+    getUserAddressList,
+    delUserAddress
+  } from "@/network/api";
   import SelectBox from "@/components/select.vue";
-  import {showModal} from "@/utils/wxapi";
+  import {
+    showModal,
+    toast
+  } from "@/utils/wxapi";
   export default {
     data() {
       return {
+        reslist:[],
         moni_addressList: [{
           userName: "孟德01",
           phone: "180****0586",
@@ -103,39 +111,68 @@
       SelectBox
     },
     computed: {
-      addressList() {
-        let list = this.moni_addressList.map((val) => {
+      getUserAddressListParams() { //获取地址列表参数
+        return {
+          openid: this.globalData.openId
+        }
+      },
+      addressList() { //地址列表
+        let list = this.reslist.map((val) => {
           return {
-            userName: val.userName,
+            userName: val.name,
             phone: val.phone,
-            address: val.address,
-            isDefaule: val.isDefaule,
+            address: `${val.region_name} ${val.address}`,
+            isDefaule: val.isdefault == 1 ? true : false,
           }
         })
         return list;
+      },
+      delUserAddressParams() { //删除地址参数
+        return {
+          openid: this.globalData.openId
+        }
       }
     },
     methods: {
       selectBack(index) { //设置默认地址
         console.log("选中",index);
-        let isDefaule = this.moni_addressList[index].isDefaule;
-        if(!isDefaule){ //每一项初始化
-          this.moni_addressList.forEach(val => {
-            val.isDefaule = isDefaule;
-          });
-        }
-        // 设置当前项
-        this.moni_addressList[index].isDefaule = !isDefaule;
+        // let isDefaule = this.moni_addressList[index].isDefaule;
+        // if(!isDefaule){ //每一项初始化
+        //   this.moni_addressList.forEach(val => {
+        //     val.isDefaule = isDefaule;
+        //   });
+        // }
+        // // 设置当前项
+        // this.moni_addressList[index].isDefaule = !isDefaule;
       },
       delAddress(index) { //删除地址
         ;(async()=>{
           let res = await showModal("删除地址", "确定删除改地址吗？", true, "#1EA3FF");
-          console.log(res);
           if (res == 'ok') {
-            this.moni_addressList.splice(index, 1);
+            let address_id = this.reslist[index].address_id
+            let delUserAddressRES = await delUserAddress(Object.assign({
+              address_id
+            }, this.delUserAddressParams));
+            if (delUserAddressRES.errCode == 0) {
+              this.reslist.splice(index, 1);
+            } else {
+              toast(delUserAddressRES.errMsg);
+            }
           }
         })()
       }
+    },
+    onShow() {
+      ;
+      (async () => {
+        let getUserAddressListRES = await getUserAddressList(this.getUserAddressListParams);
+        console.log(getUserAddressListRES);
+        if (getUserAddressListRES.errCode == 0) {
+          this.reslist = getUserAddressListRES.list;
+        } else {
+          toast(getUserAddressListRES.errMsg)
+        }
+      })()
     }
   }
 </script>

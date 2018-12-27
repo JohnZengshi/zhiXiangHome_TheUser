@@ -191,7 +191,7 @@ const toast = (content, time = 4000) => new Promise((resolve, reject) => {
     duration: time,
     success: function (res) {
       setTimeout(() => {
-        resolve(res)
+        resolve(true)
       }, time)
     },
     fail: function (e) {
