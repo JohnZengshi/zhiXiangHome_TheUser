@@ -28,10 +28,18 @@
           return ""
         }
       },
-      defaultSelect: { //默认选中
+      autoSelect: { //默认选中
         type: Boolean,
         default: () => {
           return false
+        }
+      },
+      initDataFun: { //初始化函数
+        type: Function,
+        default: ()=>{
+          return ()=>{
+            console.log("默认初始化select组件")
+          }
         }
       }
     },
@@ -40,8 +48,13 @@
         isSelect: false
       }
     },
+    watch: {
+      autoSelect: function (val) { //监听autoSelect改变选择
+        this.isSelect = val;
+      }
+    },
     methods: {
-      selectClick() {
+      selectClick() { //点击选择回调
         if (this.model == 'oneSelect') {
           this.isSelect = !this.isSelect
           this.$emit("selectBack", this.isSelect)
@@ -49,7 +62,19 @@
       }
     },
     mounted(){
-      this.isSelect = this.defaultSelect;
+      ;(async()=>{ //等待更新数据
+        await this.initDataFun()
+        this.isSelect = this.autoSelect;
+        // console.log(this.isSelect)
+      })()
+      
+    },
+    onShow(){
+      ;(async()=>{ //等待更新数据
+        await this.initDataFun()
+        this.isSelect = this.autoSelect;
+        // console.log(this.isSelect)
+      })()
     }
   }
 </script>
@@ -58,6 +83,7 @@
     height: 50rpx;
 
     .item {
+      height: 100%;
       .icon {
         width: 32rpx;
         height: 32rpx;

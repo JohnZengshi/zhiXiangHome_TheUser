@@ -33,7 +33,9 @@
             <!-- 维修说明slot -->
             <div slot="maintenanceInstructions">
                 <div class="maintenanceInstructions">
-                    <textarea class="textarea"></textarea>
+                    <textarea
+                        @blur="textareablur" 
+                        class="textarea"></textarea>
                 </div>
             </div>
             <!-- 上传图片slot -->
@@ -45,8 +47,10 @@
                             :key="index">
                             <img :src="item" alt="">
                         </li>
-                        <li>
-                            <div class="uploadBtn display_flex justify-content_flex-center align-items_center">
+                        <li v-if="fromData.uploadImgList.length < 3">
+                            <div 
+                                @click="upLoadImage"
+                                class="uploadBtn display_flex justify-content_flex-center align-items_center">
                                 <img src="/static/images/components/add-pic-icon.png" alt="">
                             </div>
                         </li>
@@ -55,7 +59,7 @@
             </div>
         </TableList>
     </div>
-    <button class="confirmBtn">提交</button>
+    <button @click="confirmBtn" class="confirmBtn">提交</button>
     <Popup 
         v-if="showPopup"
         popType="0" 
@@ -71,36 +75,38 @@
 </template>
 <script>
   import {
-    setNavigationBarTitle
+    toast,
+    setNavigationBarTitle,
+    chooseImage
   } from "@/utils/wxapi";
-
+  import {RegExpr} from "@/utils/regex";
   import TableList from "@/components/tableList";
-  import InputItem from "@/components/tableList/inputItem";
   import Popup from "@/components/popup";
   import CustomSelect from "@/components/common/select";
   export default {
     components: {
       TableList,
-      InputItem,
       Popup,
       CustomSelect
     },
     data(){
         return {
+            createdOrderType: "", //创建工单类型
             fromData:{ //表单数据
                 userName: "",
                 phone: "",
                 classification: "",
                 doorTime: ['',''],
                 serviceAddress: "",
-                detailedAddress: "这里根据默认地址获取",
-                uploadImgList:["http://img0.imgtn.bdimg.com/it/u=1337376271,3140793675&fm=26&gp=0.jpg","http://img1.imgtn.bdimg.com/it/u=1277810071,350146296&fm=26&gp=0.jpg","http://img0.imgtn.bdimg.com/it/u=1337376271,3140793675&fm=26&gp=0.jpg","http://img0.imgtn.bdimg.com/it/u=1337376271,3140793675&fm=26&gp=0.jpg"],
+                detailedAddress: "",
+                maintenanceInstructions: "",
+                uploadImgList:["http://img0.imgtn.bdimg.com/it/u=1337376271,3140793675&fm=26&gp=0.jpg","http://img1.imgtn.bdimg.com/it/u=1277810071,350146296&fm=26&gp=0.jpg"],
             },
-            showPopup: false,
-            customPopupData: {
+            showPopup: false, //是否显示弹窗
+            customPopupData: { //自定义弹窗参数
                 slotName: "select"
             },
-            selectPopupData: {
+            selectPopupData: { //选择弹窗参数
                 title: "请选择设备分类", //弹窗标题
                 key: "key", //选中的key值
                 label: "value", //显示的值
@@ -116,11 +122,12 @@
                     imgUrl: "http://img1.imgtn.bdimg.com/it/u=1277810071,350146296&fm=26&gp=0.jpg",
                 }] 
             },
-            isShowDetail: false,
+            isShowDetail: false, //显示详情
+            currentUploadImg: "", //当前上传的图片
         }
     },
     computed: {
-        dataList(){
+        dataList(){ //必填数据
             return [{
                 title: "业主姓名",
                 model: "input",
@@ -168,13 +175,15 @@
                 value: this.fromData.serviceAddress
             },{
                 title: "详细地址：",
-                model: "text",
+                model: this.createdOrderType == '2' ? "input" : "text",
                 key: "detailedAddress",
-                noLine: true,
-                value: this.fromData.detailedAddress
+                placeholder: "请输入详细地址",
+                noLine: this.createdOrderType == '2' ? false : true,
+                value: this.fromData.detailedAddress,
+                required: this.createdOrderType == '2' ? true : false,
             }]
         },
-        detailDataList(){
+        detailDataList(){ //详情数据
             return [{
               title: "维修说明（非必填）",
               model: "customOperation",
@@ -213,15 +222,66 @@
             this.fromData.classification = item.value;
             this.showPopup = false;
         },
-        showDetail(){
+        showDetail(){ //显示详情
             this.isShowDetail = !this.isShowDetail;
+        },
+        textareablur(e){ //输入域失去焦点时触发
+            this.fromData.maintenanceInstructions = e.target.value
+        },
+        upLoadImage(){
+            ;(async () => {
+              let chooseImageRES = await chooseImage(1, ['album', 'camera']);
+              console.log(chooseImageRES);
+              this.currentUploadImg = chooseImageRES.tempFilePaths[0];
+            })()
+        },
+        confirmBtn() { //提交
+          const toastFun = (key) => {
+            toast(this.dataList.find(v => {
+              return v.key == key
+            }).placeholder);
+          }
+          if (this.fromData.userName == '') {
+            toastFun('userName')
+          } else if (!RegExpr.checkUserName(this.fromData.userName)) {
+            toast("输入姓名包含特殊字符")
+          } else if (this.fromData.phone == '') {
+            toastFun('phone')
+          } else if (!RegExpr.checkMobile(this.fromData.phone)) {
+            toast("请输入正确的手机号码")
+          } else if (this.fromData.classification == '') {
+            toastFun('classification')
+          } else if (this.fromData.doorTime[0] == '') {
+            toast("请选择上门日期")
+          } else if (this.fromData.doorTime[1] == '') {
+            toast("请选择上门时间")
+          } else if (this.fromData.serviceAddress == '') {
+            toastFun('serviceAddress')
+          } else if (this.createdOrderType == '2') {
+            if (this.fromData.detailedAddress == '') {
+              toastFun('detailedAddress')
+            }
+          }
+          else {
+            console.log("输入无误", this.fromData);
+            (async () => {
+              let res = await toast("保存成功", 500)
+              if (res == 'ok') {
+                navigateBack();
+              }
+            })()
+          }
         }
     },
     onLoad(option) {
       console.log(option);
       let type = option.type;
-      if (type == '1') {
+      this.createdOrderType = type;
+      if (type == '1') { //维修
+        this.$set(this.fromData, "detailedAddress", "这里根据默认地址获取")
         setNavigationBarTitle("我要维修");
+      }else if(type == '2'){ //安装
+        setNavigationBarTitle("我要安装");
       }
     }
   }
@@ -247,6 +307,14 @@
     box-sizing: border-box;
     margin-top: 22rpx;
     >.textarea{
+        padding: 30rpx 38rpx 30rpx 38rpx;
+        box-sizing: border-box;
+        border-radius:10rpx;
+        border:1rpx solid rgba(197,197,199,1);
+        font-size:27rpx;
+        font-family:PingFangSC-Regular;
+        font-weight:400;
+        color:rgba(77,61,51,1);
         width: 690rpx;
         height: 196rpx;
         border: 1rpx solid rgba(222, 222, 222, 1);

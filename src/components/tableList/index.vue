@@ -20,9 +20,11 @@
           <!-- 输入框形式 -->
           <block v-else-if="item.model == 'input'" >
             <InputItem 
-              :inputValue="item.value"
+              ref="InputItem"
+              :initValue="item.initValue"
               :inputType="item.inputType"
               :placeholder="item.placeholder"
+              :_initDataFun="initDataFun"
               @focus="currentEdit = item.key"
               @blur="textblur"></InputItem>
           </block>
@@ -106,11 +108,15 @@
         default: () => {
           return false
         }
+      },
+      initDataFun: {
+        type: Function,
       }
     },
     components:{
       InputItem
     },
+    computed:{},
     methods: {
       textblur(val) { //输入框完成输入
         this.$emit('textblur', val, this.currentEdit);
@@ -120,7 +126,8 @@
         this.$emit('textblur', val, this.currentEdit);
       },
     },
-    mounted(){}
+    mounted() {},
+    onShow() {},
   }
 </script>
 

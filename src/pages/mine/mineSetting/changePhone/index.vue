@@ -74,29 +74,29 @@
         // })()
       },
       confirm() {
-        // let isPhone = RegExpr.checkMobile(this.phone)
-        // if (!isPhone) {
-        //   toast("请输入正确的手机号")
-        // } else if (this.code == '') {
-        //   toast("验证码不能为空")
-        // } else {
-        //   console.log("输入无误");;
-        //   (async () => {
-        //     let checkSmsCodeRES = await checkSmsCode(this.checkSmsCodeParams);
-        //     if (checkSmsCodeRES.errCode == 0) {
-        //       let changePhoneRES = await changePhone(this.changePhoneParams);
-        //       if (changePhoneRES.errCode == 0) {
-        //         await toast(changePhoneRES.msg, 1000);
-        //         navigateBack();
-        //       } else {
-        //         toast(changePhoneRES.msg)
-        //       }
-        //     } else {
-        //       toast(checkSmsCodeRES.msg)
-        //     }
+        let isPhone = RegExpr.checkMobile(this.phone)
+        if (!isPhone) {
+          toast("请输入正确的手机号")
+        } else if (this.code == '') {
+          toast("验证码不能为空")
+        } else {
+          console.log("输入无误");;
+          // (async () => {
+          //   let checkSmsCodeRES = await checkSmsCode(this.checkSmsCodeParams);
+          //   if (checkSmsCodeRES.errCode == 0) {
+          //     let changePhoneRES = await changePhone(this.changePhoneParams);
+          //     if (changePhoneRES.errCode == 0) {
+          //       await toast(changePhoneRES.msg, 1000);
+          //       navigateBack();
+          //     } else {
+          //       toast(changePhoneRES.msg)
+          //     }
+          //   } else {
+          //     toast(checkSmsCodeRES.msg)
+          //   }
 
-        //   })()
-        // }
+          // })()
+        }
       }
     }
   }

@@ -55,15 +55,16 @@
         <span class="title">评价</span>
         <block v-if="orderData.evaluation">
           <div 
-            class="evaluationList"
+            class="evaluationList display_flex align-items_center"
             :key="index"
             v-for="(item,index) in orderData.evaluation.graded">
             <span class="title">{{item.title}}</span>
             <Graded 
               :imgs="imgs" 
-              :width="15" 
-              :height="15" 
-              :starValue="1" 
+              :width="30" 
+              :height="30" 
+              :starValue="1"
+              :interval="18" 
               :initScroe="item.score"
               :isClick="false"
               @ok="back"></Graded>
@@ -201,7 +202,7 @@
             },
             evaluation: {
               graded: [{
-                title: "这是评价",
+                title: "什么什么评价",
                 score: 5,
               }],
               des: "这是评价描述",
@@ -323,6 +324,7 @@
             border-bottom: 1rpx solid rgba(241, 241, 241, 1);
             >.title{
                 font-size:27rpx;
+                margin-right: 16rpx;
                 font-family:PingFangSC-Regular;
                 font-weight:400;
                 color:rgba(77,61,51,1);

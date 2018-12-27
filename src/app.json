@@ -13,8 +13,7 @@
     "pages/mine/mineSetting/main",
     "pages/mine/mineSetting/changePhone/main",
     "pages/mine/mineSetting/addressManagement/main",
-    "pages/mine/mineSetting/addressManagement/addressDetail/main",
-    "pages/mine/mineSetting/addressManagement/addAddress/main"
+    "pages/mine/mineSetting/addressManagement/addressOperation/main"
   ],
   "window": {
     "backgroundTextStyle": "light",

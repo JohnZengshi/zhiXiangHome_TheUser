@@ -52,7 +52,7 @@
                             </div>
                             <div @click="callPhone(data.phone)" class="callPhone display_flex flex-direction_column align-items_center">
                                 <img src="/static/images/orderPage/callPhoneicon.png" alt="">
-                                <span>{{item.installerName}}</span>
+                                <span>{{data.installerName}}</span>
                             </div>
                             <div class="bottom display_flex align-items_center justify-content_flex-justify">
                                 <span class="type">{{data.status_txt}}</span>
@@ -218,44 +218,17 @@
             //       }
             //     }
             //   })()
-        } else if (id == '1') { //拒绝此单
-          this.showPopup = true;
-          this.popupData = {
-            title: "请选择拒绝工单的原因",
-            key: "id",
-            label: "text",
-            selectList: [{
-              text: "我没时间",
-              id: "0"
-            }, {
-              text: "其他",
-              id: "1"
-            }]
-          };
-        } else if (id == '2') { //签到
-          ;
-          (async () => {
-            let res = await showModal("签到", "确定签到吗？", true);
-            if (res == 'ok') {
-              let signWorkOrderRES = await signWorkOrder(this.signWorkOrderParams);
-              if (signWorkOrderRES.errCode == 0) {
-                await toast(signWorkOrderRES.msg, 1000);
-                await this.updataWorkOrderList();
-                await this.autoSwiperPage();
-              }
-            }
-          })()
         } else if (id == '3') { //服务完成
           ;
           (async () => {
             let res = await showModal("服务完成", "确定服务完成吗？", true);
             if (res == 'ok') {
-              let finishWorkOrderRES = await finishWorkOrder(this.finishWorkOrderParams);
-              if (finishWorkOrderRES.errCode == 0) {
-                toast(finishWorkOrderRES.msg, 500);
-                await this.updataWorkOrderList();
-                await this.autoSwiperPage();
-              }
+              // let finishWorkOrderRES = await finishWorkOrder(this.finishWorkOrderParams);
+              // if (finishWorkOrderRES.errCode == 0) {
+              //   toast(finishWorkOrderRES.msg, 500);
+              //   await this.updataWorkOrderList();
+              //   await this.autoSwiperPage();
+              // }
             }
           })()
           
@@ -318,7 +291,8 @@
               address: "广东省深圳市南山区粤海街道236号",
               btnList: btnList,
               status_txt: "待上门",
-              installerName: "john"
+              installerName: "john",
+              phone: "13714906176"
             }, {
               titleName: "智能版Q7",
               type: "2",
@@ -327,7 +301,8 @@
               address: "广东省深圳市南山区粤海街道236号",
               btnList: btnList,
               status_txt: "待上门",
-              installerName: "john"
+              installerName: "john",
+              phone: "13714906176"
             }, {
               titleName: "智能版Q7",
               type: "1",
@@ -336,7 +311,8 @@
               address: "广东省深圳市南山区粤海街道236号",
               btnList: btnList,
               status_txt: "待上门",
-              installerName: "john"
+              installerName: "john",
+              phone: "13714906176"
             }, {
               titleName: "智能版Q7",
               type: "2",
@@ -345,7 +321,8 @@
               address: "广东省深圳市南山区粤海街道236号",
               btnList: btnList,
               status_txt: "待上门",
-              installerName: "john"
+              installerName: "john",
+              phone: "13714906176"
             }];
           }
         }, 0)

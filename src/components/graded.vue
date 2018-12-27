@@ -24,7 +24,7 @@
       height: {
         type: Number,
       },
-      interval: {
+      interval: { //间隔
         type: Number,
       },
       starValue: {

@@ -17,19 +17,20 @@
               <div class="bottom display_flex align-items_center justify-content_flex-justify">
                 <div>
                   <SelectBox 
+                  :ref="'SelectBox_' + index"
                   model="oneSelect" 
-                  text="默认地址" 
-                  @selectBack="selectBack"
-                  :defaultSelect='item.isDefaule'></SelectBox>
+                  :text="item.isDefaule?'默认地址':'设为默认'" 
+                  @selectBack="selectBack(index)"
+                  :autoSelect='item.isDefaule'></SelectBox>
                 </div>
                 <div class="btn display_flex">
-                  <navigator url="/pages/mine/mineSetting/addressManagement/addressDetail/main" open-type="navigate" hover-class="none">
+                  <navigator url="/pages/mine/mineSetting/addressManagement/addressOperation/main?addressId='11111'" open-type="navigate" hover-class="none">
                     <div class="editor display_flex align-items_center justify-content_flex-center">
                         <img src="/static/images/minePage/editor-icon.png" alt="">
                         <span>编辑</span>
                     </div>
                   </navigator>
-                  <div class="del display_flex align-items_center justify-content_flex-center">
+                  <div @click="delAddress(index)" class="del display_flex align-items_center justify-content_flex-center">
                     <img src="/static/images/minePage/del-icon.png" alt="">
                     <span>删除</span>
                   </div>
@@ -39,20 +40,63 @@
           </li>
       </ul>
     </div>
-    <navigator
-      url="/pages/mine/mineSetting/addressManagement/addAddress/main"
-      open-type="navigate"
-      hover-class="none">
-      <button class="confirmBtn">新增地址</button>
-    </navigator>
+    <div class="btn">
+      <navigator
+        url="/pages/mine/mineSetting/addressManagement/addressOperation/main"
+        open-type="navigate"
+        hover-class="none">
+        <button class="confirmBtn">新增地址</button>
+      </navigator>
+    </div>
   </div>
 </template>
 <script>
   import SelectBox from "@/components/select.vue";
+  import {showModal} from "@/utils/wxapi";
   export default {
     data() {
       return {
-
+        moni_addressList: [{
+          userName: "孟德01",
+          phone: "180****0586",
+          address: "广东省深圳市南山区德赛科技大厦2202",
+          isDefaule: true,
+        }, {
+          userName: "孟德02",
+          phone: "180****0586",
+          address: "广东省深圳市南山区德赛科技大厦2202",
+          isDefaule: false,
+        }, {
+          userName: "孟德03",
+          phone: "180****0586",
+          address: "广东省深圳市南山区德赛科技大厦2202",
+          isDefaule: false,
+        }, {
+          userName: "孟德04",
+          phone: "180****0586",
+          address: "广东省深圳市南山区德赛科技大厦2202",
+          isDefaule: false,
+        }, {
+          userName: "孟德05",
+          phone: "180****0586",
+          address: "广东省深圳市南山区德赛科技大厦2202",
+          isDefaule: false,
+        }, {
+          userName: "孟德06",
+          phone: "180****0586",
+          address: "广东省深圳市南山区德赛科技大厦2202",
+          isDefaule: false,
+        }, {
+          userName: "孟德07",
+          phone: "180****0586",
+          address: "广东省深圳市南山区德赛科技大厦2202",
+          isDefaule: false,
+        }, {
+          userName: "孟德08",
+          phone: "180****0586",
+          address: "广东省深圳市南山区德赛科技大厦2202",
+          isDefaule: false,
+        }, ]
       }
     },
     components: {
@@ -60,52 +104,37 @@
     },
     computed: {
       addressList() {
-        return [{
-          userName: "孟德",
-          phone: "180****0586",
-          address: "广东省深圳市南山区德赛科技大厦2202",
-          isDefaule: true,
-        },{
-          userName: "孟德",
-          phone: "180****0586",
-          address: "广东省深圳市南山区德赛科技大厦2202",
-          isDefaule: false,
-        },{
-          userName: "孟德",
-          phone: "180****0586",
-          address: "广东省深圳市南山区德赛科技大厦2202",
-          isDefaule: true,
-        },{
-          userName: "孟德",
-          phone: "180****0586",
-          address: "广东省深圳市南山区德赛科技大厦2202",
-          isDefaule: false,
-        },{
-          userName: "孟德",
-          phone: "180****0586",
-          address: "广东省深圳市南山区德赛科技大厦2202",
-          isDefaule: true,
-        },{
-          userName: "孟德",
-          phone: "180****0586",
-          address: "广东省深圳市南山区德赛科技大厦2202",
-          isDefaule: false,
-        },{
-          userName: "孟德",
-          phone: "180****0586",
-          address: "广东省深圳市南山区德赛科技大厦2202",
-          isDefaule: true,
-        },{
-          userName: "孟德",
-          phone: "180****0586",
-          address: "广东省深圳市南山区德赛科技大厦2202",
-          isDefaule: false,
-        },]
+        let list = this.moni_addressList.map((val) => {
+          return {
+            userName: val.userName,
+            phone: val.phone,
+            address: val.address,
+            isDefaule: val.isDefaule,
+          }
+        })
+        return list;
       }
     },
     methods: {
-      selectBack() {
-        console.log("选中")
+      selectBack(index) { //设置默认地址
+        console.log("选中",index);
+        let isDefaule = this.moni_addressList[index].isDefaule;
+        if(!isDefaule){ //每一项初始化
+          this.moni_addressList.forEach(val => {
+            val.isDefaule = isDefaule;
+          });
+        }
+        // 设置当前项
+        this.moni_addressList[index].isDefaule = !isDefaule;
+      },
+      delAddress(index) { //删除地址
+        ;(async()=>{
+          let res = await showModal("删除地址", "确定删除改地址吗？", true, "#1EA3FF");
+          console.log(res);
+          if (res == 'ok') {
+            this.moni_addressList.splice(index, 1);
+          }
+        })()
       }
     }
   }
@@ -116,7 +145,8 @@
       height: 100%;
       background:rgba(245,245,245,1);
       .addressList{
-          height: 1059rpx;
+          // height: 1059rpx;
+          margin-bottom: 147rpx;
           overflow-y: scroll;
           ul{
               li{
@@ -159,12 +189,14 @@
                             height: 54rpx;
                             background: @baseColor;
                             border-radius:27rpx;
-                            margin-right: 20rpx;
                             img{
                               width: 30rpx;
                               height: 30rpx;
                               margin-right: 7rpx;
                             }
+                          }
+                          .editor{
+                            margin-right: 20rpx;
                           }
                         }
                     }
@@ -172,9 +204,17 @@
               }
           }
       }
-      .confirmBtn{
-        width: 670rpx;
-        margin-top: 20rpx
+      >.btn {
+        box-sizing: border-box;
+        padding: 0 40rpx;
+        width: 100%;
+        position: fixed;
+        bottom: 53rpx;
+
+        .confirmBtn {
+          width: 670rpx;
+          // margin-top: 20rpx
+        }
       }
   }
 </style>

@@ -13,9 +13,6 @@
 <script>
   export default {
       props: {
-        inputValue: {
-          type: String,
-        },
         inputType: { //输入框类型
           type: String,
           deafult: () => {
@@ -28,11 +25,17 @@
             return "请输入"
           }
         },
-        disabled: {
+        disabled: { //是否禁用
           type: Boolean,
           deafult: () => {
             return false
           }
+        },
+        initValue: { //初始化值
+          type: String,
+        },
+        _initDataFun: {
+          type: Function,
         }
       },
       data(){
@@ -53,8 +56,21 @@
         }
       },
       mounted(){
-          this.value = this.inputValue;
-      }
+        ;(async () => {
+          await this._initDataFun()
+          this.value = this.initValue
+          // console.log('mounted', this.initValue)
+        })()
+      },
+      onShow() {
+        ;(async () => {
+          await this._initDataFun()
+          this.value = this.initValue
+          // console.log('onShow', this.initValue)
+        })()
+      },
+
+      
   }
 </script>
 
