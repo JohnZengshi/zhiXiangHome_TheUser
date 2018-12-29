@@ -73,9 +73,7 @@ let tabsList = [{
     text: "进行中",
     id: "2",
     dataList: [],
-    btnList: btnList.filter((val) => {
-      return val.id == '3'
-    }),
+    btnList: [],
     updataTag: true,
     status: 3,
   },
