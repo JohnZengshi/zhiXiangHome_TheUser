@@ -1,7 +1,9 @@
 <template>
   <div class="detial display_flex flex-direction_column">
     <ul>
-      <li :key="index" v-for="(item,index) in dataList">
+      <li 
+        :key="index" v-for="(item,index) in dataList"
+        v-if="!item.isShow">
         <div 
           :class="{
             'flex-direction_column':flexDirection == 'column',
@@ -24,7 +26,6 @@
               :initValue="item.initValue"
               :inputType="item.inputType"
               :placeholder="item.placeholder"
-              :_initDataFun="initDataFun"
               @focus="currentEdit = item.key"
               @blur="textblur"></InputItem>
           </block>
@@ -108,13 +109,21 @@
         default: () => {
           return false
         }
-      },
-      initDataFun: {
-        type: Function,
       }
     },
     components:{
       InputItem
+    },
+    watch: {
+      dataList: {
+        handler(newName, oldName) {
+          // this.fullName = newName + ' ' + this.lastName;
+          // console.log('dataList',newName)
+        },
+        // 代表在wacth里声明了firstName这个方法之后立即先去执行handler方法
+        // immediate: true
+        deep: true
+      }
     },
     computed:{},
     methods: {
@@ -125,6 +134,11 @@
         let val = e.target.value;
         this.$emit('textblur', val, this.currentEdit);
       },
+      resetInputItem(){ //重置inputItem值
+        this.$refs['InputItem'].forEach((val)=>{
+          val.reset();
+        });
+      }
     },
     mounted() {},
     onShow() {},

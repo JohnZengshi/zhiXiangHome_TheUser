@@ -7,7 +7,7 @@
   function sign(options) {
     var newOption = deepClone(options);
     Object.keys(newOption).forEach((val)=>{
-      if(newOption[val] == ''){
+      if(newOption[val] === ''){
         delete newOption[val];
       }
     })
@@ -20,7 +20,7 @@
       str += k + '=' + nopt[k] + '&';
     }
     str = str.substring(0, str.length - 1) + options.signkey;
-    console.log(str)
+    // console.log(str)
     // options.sign = md5(str);
     return md5(str);
   };

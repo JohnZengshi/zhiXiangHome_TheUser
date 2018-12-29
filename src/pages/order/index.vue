@@ -50,12 +50,17 @@
                                 <span class="order">单号：{{data.order}}</span>
                                 <span class="appointment">预约时间：{{data.appointment}}</span>
                             </div>
-                            <div @click="callPhone(data.phone)" class="callPhone display_flex flex-direction_column align-items_center">
+                            <div 
+                                v-if="data.installerPhone"
+                                @click="callPhone(data.installerPhone)" 
+                                class="callPhone display_flex flex-direction_column align-items_center">
                                 <img src="/static/images/orderPage/callPhoneicon.png" alt="">
                                 <span>{{data.installerName}}</span>
                             </div>
                             <div class="bottom display_flex align-items_center justify-content_flex-justify">
-                                <span class="type">{{data.status_txt}}</span>
+                                <span 
+                                  :class="{active:data.status.active}"
+                                  class="type">{{data.status.text}}</span>
                                 <button 
                                     @click="clickBtn(btn,data)" 
                                     :class="{active : btn.active}" 
@@ -92,14 +97,16 @@
   import {
     tabsList, //tabs栏数据
     order_statusList,
+    btnList
   } from "@/constants/orderData"
-//   import {
-//     getWorkOrderList,
-//     receiveWorkOrder,
-//     refuseWorkOrder,
-//     signWorkOrder,
-//     finishWorkOrder
-//   } from "@/network/api";
+  import {
+    getWorkOrderList,
+    cancelWorkOrder,
+    // receiveWorkOrder,
+    // refuseWorkOrder,
+    // signWorkOrder,
+    // finishWorkOrder
+  } from "@/network/api";
 //   import {deepClone} from "@/utils/deepClone";
   export default {
     components: {
@@ -174,6 +181,12 @@
           openid: this.globalData.openId,
           worder_sn: this.currentOrder.order
         }
+      },
+      cancelWorkOrderParams(){ //用户取消工单操作参数
+        return {
+          openid: this.globalData.openId,
+          worder_sn: this.currentOrder.order,
+        }
       }
     },
     watch: {
@@ -181,8 +194,8 @@
         let index = value - 0;
         let isCanUpdata = this.swiperDataList[index].updataTag;
         if(isCanUpdata){
-        //   this.updataWorkOrderList();
-        this.getData(index)
+          this.updataWorkOrderList();
+        // this.getData(index)
         }else{
           return 
         }
@@ -205,19 +218,19 @@
         // wx.hideTabBar({})
         if (id == '0') { //取消工单
             this.showPopup = true;
-            //   ;
-            //   (async () => {
-            //     let res = await showModal("接单", "确定接此订单吗？", true);
-            //     console.log(res);
-            //     if (res == 'ok') {
-            //       let receiveWorkOrderRES = await receiveWorkOrder(this.receiveWorkOrderParams)
-            //       if (receiveWorkOrderRES.errCode == 0) {
-            //         await toast(receiveWorkOrderRES.msg, 500);
-            //         await this.updataWorkOrderList();
-            //         await this.autoSwiperPage();
-            //       }
-            //     }
-            //   })()
+              // ;
+              // (async () => {
+              //   let res = await showModal("取消工单", "确定取消该工单吗？", true);
+              //   console.log(res);
+              //   if (res == 'ok') {
+              //     let cancelWorkOrderRES = await cancelWorkOrder(this.cancelWorkOrderParams)
+              //     if (cancelWorkOrderRES.errCode == 0) {
+              //       await toast(cancelWorkOrderRES.msg, 500);
+              //       await this.updataWorkOrderList();
+              //       await this.autoSwiperPage();
+              //     }
+              //   }
+              // })()
         } else if (id == '3') { //服务完成
           ;
           (async () => {
@@ -232,8 +245,8 @@
             }
           })()
           
-        } else if (id == '4') { //评价
-            navigateTo("/pages/order/evaluation/main");
+        } else if (id == '4' || id == '7') { //评价
+            navigateTo(`/pages/order/evaluation/main?order=${data.order}&type=${id}`);
             //   ;
             //   (async () => {
             //     let res = await showModal("服务完成", "确定服务完成吗？", true);
@@ -254,6 +267,19 @@
           })()
         }
       },
+      filterBtn(btnList, val, currentIndex) { // 工单按钮过滤
+        if (currentIndex == '4') { //已完成的工单按钮判断
+          return btnList.filter((v) => {
+            if (val.first_assess == 0) {
+              return v.id == "4" //首次已评价
+            } else if (val.append_assess == 0) {
+              return v.id == "7" //首次追加评价
+            }
+          });
+        }else{
+          return btnList
+        }
+      },
       hidePopup() { //隐藏弹窗
         this.showPopup = false;
         // wx.showTabBar({})
@@ -261,16 +287,16 @@
       confirm(data) { //弹窗确定
         console.log(data);
         this.showPopup = false;
-        // ;(async()=>{
-        //   let refuseWorkOrderRES = await refuseWorkOrder(Object.assign({
-        //     remark: data.text
-        //   }, this.refuseWorkOrderParams))
-        //   if (refuseWorkOrderRES.errCode == 0) {
-        //     await toast(refuseWorkOrderRES.msg, 1000);
-        //     await this.updataWorkOrderList();
-        //     this.swiperDataList[tabsList.length-1].updataTag = true;
-        //   }
-        // })()
+        ;(async()=>{
+          let cancelWorkOrderRES = await cancelWorkOrder(Object.assign({
+            remark: data.value
+          }, this.cancelWorkOrderParams))
+          if (cancelWorkOrderRES.errCode == 0) {
+            await toast(cancelWorkOrderRES.msg, 1000);
+            await this.updataWorkOrderList();
+            this.swiperDataList[tabsList.length-1].updataTag = true;
+          }
+        })()
       },
       navigatoDetail(id) { //点击卡片跳转到工单详情
         let url = `/pages/order/orderDetail/main?orderId=${id}`;
@@ -328,59 +354,55 @@
         }, 0)
       },
       getWorkOrderList() {; //获取工单数据
+        let currentIndex = this.currentSwiperIndex;
         return (async () => {
           let getWorkOrderListRES = await getWorkOrderList(this.getWorkOrderListParams);
           console.log(getWorkOrderListRES)
           if(getWorkOrderListRES.errCode == 0){
-            console.log(getWorkOrderListRES.list)
-            let btnList = tabsList[this.currentSwiperIndex].btnList
+            // console.log(getWorkOrderListRES.list)
             let list = getWorkOrderListRES.list.map((val)=>{
-              if (this.currentSwiperIndex == '3') { //已完成的工单按钮判断
-                btnList = btnList.filter((v) => {
-                  if (val.has_assess == 1) {
-                    return v.id == "6" //已评价
-                  }else{
-                    return v.id == "4" //待评价
-                  }
-                })
-              }
+              let btnList = tabsList[currentIndex].btnList;
+              btnList = this.filterBtn(btnList, val, currentIndex);
+              console.log(btnList);
               let item = {
                 titleName: val.sku_name,
                 type: val.work_order_type,
                 order: val.worder_sn,
                 appointment: val.appointment,
                 address: val.address,
-                phone: val.phone,
+                installerPhone: val.installer_phone,
                 btnList: btnList,
-                status_txt: order_statusList.find((v)=>{
+                status: order_statusList.find((v)=>{
                   return v.status == val.work_order_status
-                }).text
+                }),
+                installerName:val.installer_name
               };
               return item;
               
             })
             return list;
-            // this.swiperDataList[this.currentSwiperIndex].dataList = list;
+            // this.swiperDataList[currentIndex].dataList = list;
           }else{
             return []
           }
         })()
       },
       updataWorkOrderList() { //刷新工单数据
+        let currentIndex = this.currentSwiperIndex;
         return (async () => {
-          if (Array.isArray(tabsList[this.currentSwiperIndex].status)) { //有多个状态
-            this.swiperDataList[this.currentSwiperIndex].dataList = [];
-            let statusList = tabsList[this.currentSwiperIndex].status;
+          if (Array.isArray(tabsList[currentIndex].status)) { //有多个状态
+            this.swiperDataList[currentIndex].dataList = [];
+            let statusList = tabsList[currentIndex].status;
             statusList.forEach(async (val) => {
-              tabsList[this.currentSwiperIndex].status = val;
+              tabsList[currentIndex].status = val;
               let List = await this.getWorkOrderList()
-              this.swiperDataList[this.currentSwiperIndex].dataList = this.swiperDataList[this.currentSwiperIndex].dataList.concat(List);
+              this.swiperDataList[currentIndex].dataList = this.swiperDataList[currentIndex].dataList.concat(List);
             });
-            tabsList[this.currentSwiperIndex].status = statusList;
+            tabsList[currentIndex].status = statusList;
           } else {
-            this.swiperDataList[this.currentSwiperIndex].dataList = await this.getWorkOrderList();
+            this.swiperDataList[currentIndex].dataList = await this.getWorkOrderList();
           }
-          this.swiperDataList[this.currentSwiperIndex].updataTag = false; //单个页面默认滑动只刷新一次
+          this.swiperDataList[currentIndex].updataTag = true; //单个页面默认滑动只刷新一次
           return true;
         })()
       },
@@ -399,10 +421,9 @@
     onShow() {
       console.log("home-show")
       if(this.globalData.openId != ''){
-        // this.updataWorkOrderList();
-        
+        this.updataWorkOrderList();
       }
-      this.getData('0')
+      // this.getData('0')
     }
   }
 </script>
@@ -424,6 +445,7 @@
     }
     .swiperItemContent {
       overflow-y: scroll;
+      -webkit-overflow-scrolling: touch;
 
       ul {
         box-sizing: border-box;
@@ -533,7 +555,10 @@
                     font-size:27rpx;
                     font-family:PingFangSC-Semibold;
                     font-weight:600;
-                    color:rgba(239,92,92,1);
+                    color:rgba(197,197,199,1);
+                    &.active{
+                      color:rgba(239,92,92,1);
+                    }
                 }
               }
 

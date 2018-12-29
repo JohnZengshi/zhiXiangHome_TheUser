@@ -34,14 +34,6 @@
           return false
         }
       },
-      initDataFun: { //初始化函数
-        type: Function,
-        default: ()=>{
-          return ()=>{
-            console.log("默认初始化select组件")
-          }
-        }
-      }
     },
     data() {
       return {
@@ -62,19 +54,10 @@
       }
     },
     mounted(){
-      ;(async()=>{ //等待更新数据
-        await this.initDataFun()
-        this.isSelect = this.autoSelect;
-        // console.log(this.isSelect)
-      })()
-      
+      this.isSelect = this.autoSelect;
     },
     onShow(){
-      ;(async()=>{ //等待更新数据
-        await this.initDataFun()
-        this.isSelect = this.autoSelect;
-        // console.log(this.isSelect)
-      })()
+      this.isSelect = this.autoSelect;
     }
   }
 </script>

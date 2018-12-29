@@ -24,10 +24,13 @@
                   :autoSelect='item.isDefaule'></SelectBox>
                 </div>
                 <div class="btn display_flex">
-                  <navigator url="/pages/mine/mineSetting/addressManagement/addressOperation/main?addressId='11111'" open-type="navigate" hover-class="none">
+                  <navigator 
+                    :url="'/pages/mine/mineSetting/addressManagement/addressOperation/main?addressId='+item.address_id"
+                    open-type="navigate" 
+                    hover-class="none">
                     <div class="editor display_flex align-items_center justify-content_flex-center">
-                        <img src="/static/images/minePage/editor-icon.png" alt="">
-                        <span>编辑</span>
+                      <img src="/static/images/minePage/editor-icon.png" alt="">
+                      <span>编辑</span>
                     </div>
                   </navigator>
                   <div @click="delAddress(index)" class="del display_flex align-items_center justify-content_flex-center">
@@ -123,6 +126,7 @@
             phone: val.phone,
             address: `${val.region_name} ${val.address}`,
             isDefaule: val.isdefault == 1 ? true : false,
+            address_id: val.address_id
           }
         })
         return list;
@@ -185,6 +189,7 @@
           // height: 1059rpx;
           margin-bottom: 147rpx;
           overflow-y: scroll;
+          -webkit-overflow-scrolling: touch;
           ul{
               li{
                   margin-bottom: 16rpx;

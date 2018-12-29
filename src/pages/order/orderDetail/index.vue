@@ -8,7 +8,7 @@
           <li 
           :key="index"
           v-for="(item,index) in orderData.detail"
-          v-if="!item.hide">
+          v-if="!item.isShow">
             <div class="item display_flex justify-content_flex-justify align-items_center">
               <div class="display_flex align-items_center">
                 <span class="line"></span>
@@ -69,11 +69,15 @@
               :isClick="false"
               @ok="back"></Graded>
           </div>
-          <div class="evaluationBox line display_flex flex-direction_column">
+          <div
+            v-if="orderData.evaluation.des != ''"
+            class="evaluationBox line display_flex flex-direction_column">
             <span class="des title">用户评价：</span>
             <span class="des">{{orderData.evaluation.des}}</span>
           </div>
-          <div class="evaluationBox display_flex flex-direction_column">
+          <div 
+            v-if="orderData.evaluation.additionalDes != ''"
+            class="evaluationBox display_flex flex-direction_column">
             <span class="des title">追加评价：</span>
             <span class="des">{{orderData.evaluation.additionalDes}}</span>
           </div>
@@ -91,7 +95,7 @@
 <script>
   import Graded from "@/components/graded.vue";
   import TableList from "@/components/tableList"
-//   import {getWorkOrderDetail} from "@/network/api";
+  import {getWorkOrderDetail} from "@/network/api";
   import NoData from "@/components/noData";
   export default {
     data() {
@@ -113,33 +117,40 @@
           const installer = this.orderDetail.installer;
           const sku = this.orderDetail.sku;
           const assess_list = this.orderDetail.assess_list;
-          
           return {
             detail: [{
               title: "状态",
-              value: detail.status_txt
+              value: detail.status_txt,
+              model: "text"
             }, {
               title: "工单编号",
-              value: detail.worder_sn
+              value: detail.worder_sn,
+              model: "text"
             }, {
               title: "售后类型",
-              value: detail.work_order_type == 1 ? '安装' : '维修'
+              value: detail.work_order_type == 1 ? '安装' : '维修',
+              model: "text"
             }, {
               title: "设备分类",
-              value: sku.name
+              value: sku.name,
+              model: "text"
             }, {
               title: "业主姓名",
-              value: detail.user_name
+              value: detail.user_name,
+              model: "text"
             }, {
               title: "联系电话",
-              value: detail.phone
+              value: detail.phone,
+              model: "text"
             }, {
               title: "预约时间",
-              value: detail.appointment
+              value: detail.appointment,
+              model: "text"
             }, {
               title: "完成时间",
-              value: detail.finish_timem,
-              hide: detail.work_order_type != 4 ? true : false,
+              value: detail.finish_time,
+              isShow: detail.work_order_status == 4 ? false : true,
+              model: "text"
             }],
             adress: detail.address,
             instructions: {
@@ -155,7 +166,7 @@
                 }
               }),
               des: assess_list[0].msg,
-              additionalDes: assess_list[1].msg,
+              additionalDes: assess_list[1] ? assess_list[1].msg : "",
             }
           }
         }else{
@@ -191,8 +202,8 @@
             }, {
               title: "完成时间",
               value: "",
-              model: "text"
-            //   hide: detail.work_order_type != 4 ? true : false,
+              model: "text",
+              isShow: false,
             }],
             adress: "",
             instructions: {
@@ -200,14 +211,7 @@
               des: "",
               pic: []
             },
-            evaluation: {
-              graded: [{
-                title: "什么什么评价",
-                score: 5,
-              }],
-              des: "这是评价描述",
-              additionalDes: "这是追加评价",
-            }
+            evaluation: null
           }
         }
       },
@@ -225,17 +229,17 @@
     },
     onLoad(option) {
       console.log(`工单id:${option.orderId}`);
-    //   this.orderId = option.orderId;
-    //   ;(async()=>{
-    //     let getWorkOrderDetailRES = await getWorkOrderDetail(this.getWorkOrderDetailParams);
-    //     console.log(getWorkOrderDetailRES);
-    //     if(getWorkOrderDetailRES.errCode == 0){
-    //       this.orderDetail = getWorkOrderDetailRES;
-    //       console.log(this.orderDetail);
-    //     }else{
+      this.orderId = option.orderId;
+      ;(async()=>{
+        let getWorkOrderDetailRES = await getWorkOrderDetail(this.getWorkOrderDetailParams);
+        console.log(getWorkOrderDetailRES);
+        if(getWorkOrderDetailRES.errCode == 0){
+          this.orderDetail = getWorkOrderDetailRES;
+          console.log(this.orderDetail);
+        }else{
 
-    //     }
-    //   })()
+        }
+      })()
     }
   }
 </script>

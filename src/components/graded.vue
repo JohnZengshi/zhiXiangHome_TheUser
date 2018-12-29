@@ -36,8 +36,20 @@
           return true
         }
       },
+      allScore: { //总分值
+        type: Number,
+        default: () => {
+          return 5
+        }
+      },
       initScroe: { //初始化分数
         type: Number,
+        default: () => {
+          return 0
+        }
+      },
+      currentItem: { //当前点击的项
+        type: Object,
       }
     },
     // 属性          类型        单位          说明
@@ -53,22 +65,11 @@
     },
     mounted() {
       let starNum = this.initScroe / this.starValue; //初始化
-      this.stars = [{
+      for (let index = 0; index < parseInt(this.allScore); index++) {
+        this.stars.push({
           img: this.imgs[0]
-        },
-        {
-          img: this.imgs[0]
-        },
-        {
-          img: this.imgs[0]
-        },
-        {
-          img: this.imgs[0]
-        },
-        {
-          img: this.imgs[0]
-        }
-      ];
+        })
+      }
       this.stars.forEach((val, index) => {
         if (index < starNum) {
           val.img = this.imgs[2]
@@ -95,7 +96,7 @@
         //     val.img = this.imgs[0];
         //   }
         // });
-        this.$emit("ok", starNum)
+        this.$emit("ok", this.currentItem, starNum)
       }
     }
   }

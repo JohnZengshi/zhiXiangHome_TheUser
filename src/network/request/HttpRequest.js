@@ -203,12 +203,12 @@ const HttpUtils = {
               
             } else {
               wx.showToast({
-                title: res.errMsg,
+                title: "服务器错误",
                 icon: 'none',
                 duration: 4000
               })
             }
-            networkLog(url, params, res.data, beforeRequest, isSuccess)
+            // networkLog(url, params, res.data, beforeRequest, isSuccess)
           },
           fail: function (e) {
             wx.showToast({
@@ -216,7 +216,7 @@ const HttpUtils = {
               icon: 'none',
               duration: 4000
             })
-            networkLog(url, params, e, beforeRequest, false)
+            // networkLog(url, params, e, beforeRequest, false)
             reject(e)
           },
           complete: function () {

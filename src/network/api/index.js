@@ -62,30 +62,69 @@ const uploadImage = (params = {}) => { //图片上传
 
 
 /**----------------------工单管理------------ */
+const postWorkOrder = (params = {}) => { //用户提交维修工单
+  params.method = 'postWorkOrder';
+  return postFetch('', Object.assign(params, publicParams), true);
+}
+
+const getWorkOrderGoodsList = (params = {}) => { //获取可维修产品列表
+  params.method = 'getWorkOrderGoodsList';
+  return postFetch('', Object.assign(params, publicParams), true);
+} 
+
+const getWorkOrderList = (params = {}) => { //工单列表
+  params.method = 'getWorkOrderList';
+  return postFetch('', Object.assign(params, publicParams), false);
+}
+
+const cancelWorkOrder = (params = {}) => { //取消工单操作
+  params.method = 'cancelWorkOrder';
+  return postFetch('', Object.assign(params, publicParams), true);
+}
+
+const getWorkOrderDetail = (params = {}) => { //工单详情
+  params.method = 'getWorkOrderDetail';
+  return postFetch('', Object.assign(params, publicParams), true);
+}
+
+const getWorkOrderAssessConfig = (params = {}) => { //获取工单评价评分配置
+  params.method = 'getWorkOrderAssessConfig';
+  return postFetch('', Object.assign(params, publicParams), true);
+}
+
+const assessWorkOrder = (params = {}) => { //客户评价工单操作
+  params.method = 'assessWorkOrder';
+  return postFetch('', Object.assign(params, publicParams), true);
+}
 
 /**----------------------地址管理------------ */
-const getRegions = (params = {}) => { //地址列表
+const getRegions = (params = {}) => { //地址区域列表
   params.method = 'getRegions';
   return postFetchFromCache('', Object.assign(params, publicParams), true);
 }
 
-const getOneRegions = (params = {}) => { //地址列表
+const getOneRegions = (params = {}) => { //单个地址区域列表
   params.method = 'getRegions';
   return postFetch('', Object.assign(params, publicParams), true);
 }
 
-const getUserAddressList = (params = {}) => { //地址列表
+const getUserAddressList = (params = {}) => { //用户地址列表
   params.method = 'getUserAddressList';
   return postFetch('', Object.assign(params, publicParams), true);
 }
 
-const updateUserAddress = (params = {}) => {
+const updateUserAddress = (params = {}) => { //新增/编辑地址
   params.method = 'updateUserAddress';
   return postFetch('', Object.assign(params, publicParams), true);
 }
 
-const delUserAddress = (params = {}) => {
+const delUserAddress = (params = {}) => { //删除地址
   params.method = 'delUserAddress';
+  return postFetch('', Object.assign(params, publicParams), true);
+}
+
+const getUserAddressDetail = (params = {}) => {
+  params.method = 'getUserAddressDetail';
   return postFetch('', Object.assign(params, publicParams), true);
 }
 
@@ -97,9 +136,18 @@ export {
   sendSmsCode,
   checkSmsCode,
   getUserProfile,
+  uploadImage,
+  postWorkOrder,
+  getWorkOrderGoodsList,
+  getWorkOrderList,
+  getWorkOrderDetail,
+  getWorkOrderAssessConfig,
+  cancelWorkOrder,
+  assessWorkOrder,
   getRegions,
   getOneRegions,
   getUserAddressList,
   updateUserAddress,
-  delUserAddress
+  delUserAddress,
+  getUserAddressDetail,
 }

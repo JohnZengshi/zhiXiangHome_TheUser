@@ -33,9 +33,6 @@
         },
         initValue: { //初始化值
           type: String,
-        },
-        _initDataFun: {
-          type: Function,
         }
       },
       data(){
@@ -43,7 +40,11 @@
               value:"",
           }
       },
-      watch: {},
+      watch: {
+        initValue: function (value) {
+          this.value = value
+        }
+      },
       methods: {
         focus() {
           this.$emit('focus')
@@ -53,21 +54,16 @@
         },
         blur() {
           this.$emit('blur',this.value)
+        },
+        reset() { //重置值
+          this.value = this.initValue;
         }
       },
       mounted(){
-        ;(async () => {
-          await this._initDataFun()
-          this.value = this.initValue
-          // console.log('mounted', this.initValue)
-        })()
+        // this.value = this.initValue
       },
       onShow() {
-        ;(async () => {
-          await this._initDataFun()
-          this.value = this.initValue
-          // console.log('onShow', this.initValue)
-        })()
+        // this.value = this.initValue
       },
 
       

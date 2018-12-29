@@ -1,6 +1,7 @@
 <template>
-  <div class="createdOrderPage display_flex flex-direction_column align-items_center">
+  <div class="createdOrderPage">
     <TableList
+        ref="TableList"
         :dataList="dataList"
         @textblur="textblur">
         <!-- 设备分类slot --> 
@@ -59,7 +60,9 @@
             </div>
         </TableList>
     </div>
-    <button @click="confirmBtn" class="confirmBtn">提交</button>
+    <div class="btn">
+        <button @click="confirmBtn" class="confirmBtn">提交</button>
+    </div>
     <Popup 
         v-if="showPopup"
         popType="0" 
@@ -75,10 +78,29 @@
 </template>
 <script>
   import {
+    mapState
+  } from "vuex";
+  import {
+    postWorkOrder,
+    getWorkOrderGoodsList,
+    getOneRegions,
+  } from "@/network/api";
+  import {
     toast,
     setNavigationBarTitle,
-    chooseImage
+    chooseImage,
+    uploadFile,
+    switchTab
   } from "@/utils/wxapi";
+  import {
+    publicParams
+  } from "@/network/config/publicParams";
+  import {
+    API_URL,
+  } from '@/network/config/hostConfig';
+  import {
+    sign as getSign
+  } from "@/utils/signEncryption";
   import {RegExpr} from "@/utils/regex";
   import TableList from "@/components/tableList";
   import Popup from "@/components/popup";
@@ -97,36 +119,32 @@
                 phone: "",
                 classification: "",
                 doorTime: ['',''],
-                serviceAddress: "",
+                serviceAddress: [],
                 detailedAddress: "",
                 maintenanceInstructions: "",
-                uploadImgList:["http://img0.imgtn.bdimg.com/it/u=1337376271,3140793675&fm=26&gp=0.jpg","http://img1.imgtn.bdimg.com/it/u=1277810071,350146296&fm=26&gp=0.jpg"],
+                uploadImgList:[],
+            },
+            initFromData: {
+                userName: "",
+                phone: "",
+                detailedAddress: "",
             },
             showPopup: false, //是否显示弹窗
             customPopupData: { //自定义弹窗参数
                 slotName: "select"
             },
-            selectPopupData: { //选择弹窗参数
-                title: "请选择设备分类", //弹窗标题
-                key: "key", //选中的key值
-                label: "value", //显示的值
-                selectList: [{ //选中列表
-                    key: "123",
-                    value: "哈哈哈",
-                    noSelectIcon: true,
-                    imgUrl: "http://img0.imgtn.bdimg.com/it/u=1337376271,3140793675&fm=26&gp=0.jpg",
-                },{ 
-                    key: "666",
-                    value: "777",
-                    noSelectIcon: true,
-                    imgUrl: "http://img1.imgtn.bdimg.com/it/u=1277810071,350146296&fm=26&gp=0.jpg",
-                }] 
-            },
+            
             isShowDetail: false, //显示详情
             currentUploadImg: "", //当前上传的图片
+            workOrderGoodsList: [], //可维修产品列表
+            selectGood: {},
+            selectRegion_id: "",
         }
     },
     computed: {
+        ...mapState({
+          cityList: state => state.regions.list //城市列表
+        }),
         dataList(){ //必填数据
             return [{
                 title: "业主姓名",
@@ -134,7 +152,8 @@
                 placeholder: "请输入姓名",
                 key: "userName",
                 required: true,
-                value: this.fromData.userName
+                value: this.fromData.userName,
+                initValue: this.initFromData.userName
             },{
                 title: "联系电话",
                 model: "input",
@@ -142,7 +161,8 @@
                 placeholder: "请输入联系电话",
                 key: "phone",
                 required: true,
-                value: this.fromData.phone
+                value: this.fromData.phone,
+                initValue: this.initFromData.phone
             },{
                 title: "设备分类",
                 model: "customOperation",
@@ -175,12 +195,13 @@
                 value: this.fromData.serviceAddress
             },{
                 title: "详细地址：",
-                model: this.createdOrderType == '2' ? "input" : "text",
+                model: "input",
                 key: "detailedAddress",
                 placeholder: "请输入详细地址",
-                noLine: this.createdOrderType == '2' ? false : true,
+                noLine: false,
                 value: this.fromData.detailedAddress,
-                required: this.createdOrderType == '2' ? true : false,
+                initValue: this.initFromData.detailedAddress,
+                required: true,
             }]
         },
         detailDataList(){ //详情数据
@@ -198,19 +219,76 @@
           return this.dataList.find((val) => {
             return val.key == 'classification'
           })
-        }
-    },
+        },
+        selectPopupData() { //选择弹窗参数
+          let selectList = this.workOrderGoodsList.map((val) => {
+            return { //选中列表
+              goods_id: val.goods_id,
+              name: val.name,
+              noSelectIcon: true,
+              imgUrl: val.thumb,
+            }
+          })
+          return {
+            title: "请选择设备分类", //弹窗标题
+            key: "goods_id", //选中的key值
+            label: "name", //显示的值
+            selectList: selectList
+          }
+        },
+        postWorkOrderParams() { //用户提交维修工单参数
+            return {
+                openid:this.globalData.openId,
+                goods_id:this.selectGood.goods_id,
+                user_name:this.fromData.userName,
+                phone: this.fromData.phone,
+                region_id: this.selectRegion_id,
+                region_name: this.fromData.serviceAddress.join(" "),
+                address: this.fromData.detailedAddress,
+                appointment: this.fromData.doorTime.join(" "),
+                fault_desc: this.fromData.maintenanceInstructions,
+                images: this.fromData.uploadImgList.join(",")
+            }
+        },
+        uploadImageParams() { //图片上传参数
+          let params = {
+            openid: this.globalData.openId,
+            method: 'uploadImage',
+            type: "idcard",
+            ...publicParams,
+          };
+          params.sign = getSign(params);
+          return {
+            // openid: this.globalData.openId,
+            // file: this.currentUploadImg,
+            url: API_URL,
+            filePath: this.currentUploadImg,
+            name: "file",
+            formData: params,
+          }
+        },
+        
+      },
     methods:{
         textblur(val,key){
             console.log(val,key)
-            if(key == 'doorTime'){
-                if(val.includes("-")){
-                    this.fromData[key].splice(0,1,val)
-                }else if(val.includes(":")){
-                    this.fromData[key].splice(1,1,val)
+            if (typeof (val) != "undefined") {
+              if (key == 'doorTime') {
+                if (val.includes("-")) {
+                  this.fromData[key].splice(0, 1, val)
+                } else if (val.includes(":")) {
+                  this.fromData[key].splice(1, 1, val)
                 }
-            }else{
+              } else if (key == 'serviceAddress') {
+                  ;
+                  (async () => {
+                    let region_id = await this.getFinalRegions(val);
+                    this.selectRegion_id = region_id;
+                  })()
+                  this.fromData[key] = val;
+              } else {
                 this.fromData[key] = val;
+              }
             }
         },
         selectClassification(){ //选择设备类型
@@ -219,7 +297,8 @@
         },
         selectItem(item){ //点击某一项触发
             console.log(item);
-            this.fromData.classification = item.value;
+            this.fromData.classification = item.name;
+            this.selectGood = item;
             this.showPopup = false;
         },
         showDetail(){ //显示详情
@@ -228,11 +307,16 @@
         textareablur(e){ //输入域失去焦点时触发
             this.fromData.maintenanceInstructions = e.target.value
         },
-        upLoadImage(){
+        upLoadImage(){ //上传图片
             ;(async () => {
               let chooseImageRES = await chooseImage(1, ['album', 'camera']);
-              console.log(chooseImageRES);
               this.currentUploadImg = chooseImageRES.tempFilePaths[0];
+              let uploadFileRES = await uploadFile(this.uploadImageParams);
+              if (uploadFileRES.errCode == 0) { //上传成功
+                this.fromData.uploadImgList.push(uploadFileRES.file.file)
+              } else {
+                toast(uploadFileRES.errMsg)
+              }
             })()
         },
         confirmBtn() { //提交
@@ -257,20 +341,54 @@
             toast("请选择上门时间")
           } else if (this.fromData.serviceAddress == '') {
             toastFun('serviceAddress')
-          } else if (this.createdOrderType == '2') {
-            if (this.fromData.detailedAddress == '') {
-              toastFun('detailedAddress')
-            }
+          } else if (this.fromData.detailedAddress == '') {
+            toastFun('detailedAddress')
           }
           else {
-            console.log("输入无误", this.fromData);
+            console.log("输入无误", this.postWorkOrderParams);
             (async () => {
-              let res = await toast("保存成功", 500)
-              if (res == 'ok') {
-                navigateBack();
+              let postWorkOrderRES = await postWorkOrder(this.postWorkOrderParams)
+              console.log(postWorkOrderRES)
+              if (postWorkOrderRES.errCode == 0) {
+                let res = await toast(postWorkOrderRES.msg, 500)
+                if (res) {
+                  this.resetFrom();
+                  switchTab("/pages/order/main");
+                }
+              }else{
+                  toast(postWorkOrderRES.errMsg)
               }
             })()
           }
+        },
+        getFinalRegions(valList) { //获取regions_id
+          // valList.forEach(async (val) => {})//forEach不会阻塞循环,不能用
+          return (async () => {
+            let cityList = this.cityList;
+            let parent_id;
+            let parent_idList = [];
+            for (let i = 0; i < valList.length; i++) {
+              let item = cityList.find((v) => {
+                return v.region_name == valList[i]
+              });
+              parent_id = item.region_id;
+              parent_idList.push(parent_id);
+              let getOneRegionsRES = await getOneRegions({
+                parent_id
+              });
+              cityList = getOneRegionsRES.list;
+              // console.log(parent_idList);
+            };
+            return parent_idList[parent_idList.length - 1]
+          })()
+        },
+        resetFrom(){ //重置表单
+          this.$set(this.fromData,"classification","");
+          this.$set(this.fromData,"doorTime",['','']);
+          this.$set(this.fromData,"serviceAddress",[]);
+          this.$set(this.fromData,"maintenanceInstructions","");
+          this.$set(this.fromData,"uploadImgList",[]);
+          this.$refs['TableList'].resetInputItem();
         }
     },
     onLoad(option) {
@@ -278,16 +396,32 @@
       let type = option.type;
       this.createdOrderType = type;
       if (type == '1') { //维修
-        this.$set(this.fromData, "detailedAddress", "这里根据默认地址获取")
+        ;(async()=>{
+            let getWorkOrderGoodsListRES =await getWorkOrderGoodsList();
+            if(getWorkOrderGoodsListRES.errCode == 0){
+                this.workOrderGoodsList = getWorkOrderGoodsListRES.list
+            }else{
+                toast(getWorkOrderGoodsListRES.errMsg)
+            }
+        })()
+        // this.$set(this.fromData, "detailedAddress", "这里根据默认地址获取")
         setNavigationBarTitle("我要维修");
       }else if(type == '2'){ //安装
         setNavigationBarTitle("我要安装");
       }
+    },
+    onShow() {
+      
     }
   }
 </script>
 <style lang="less" scoped>
 .createdOrderPage {
+  width: 100%;
+  height: 100%;
+  overflow-y: scroll;
+  -webkit-overflow-ing: touch;
+
   .classificationSelect {
     font-size: 27rpx;
     font-family: PingFangSC-Regular;
@@ -295,35 +429,40 @@
     color: rgba(77, 61, 51, 1);
     max-width: 470rpx;
     text-align: right;
+
     .arrows {
-        width: 13rpx;
-        height: 23rpx;
-        margin-left: 27rpx;
+      width: 13rpx;
+      height: 23rpx;
+      margin-left: 27rpx;
     }
 
-    
+
   }
+
   .maintenanceInstructions {
     box-sizing: border-box;
     margin-top: 22rpx;
-    >.textarea{
-        padding: 30rpx 38rpx 30rpx 38rpx;
-        box-sizing: border-box;
-        border-radius:10rpx;
-        border:1rpx solid rgba(197,197,199,1);
-        font-size:27rpx;
-        font-family:PingFangSC-Regular;
-        font-weight:400;
-        color:rgba(77,61,51,1);
-        width: 690rpx;
-        height: 196rpx;
-        border: 1rpx solid rgba(222, 222, 222, 1);
+
+    >.textarea {
+      padding: 30rpx 38rpx 30rpx 38rpx;
+      box-sizing: border-box;
+      border-radius: 10rpx;
+      border: 1rpx solid rgba(197, 197, 199, 1);
+      font-size: 27rpx;
+      font-family: PingFangSC-Regular;
+      font-weight: 400;
+      color: rgba(77, 61, 51, 1);
+      width: 690rpx;
+      height: 196rpx;
+      border: 1rpx solid rgba(222, 222, 222, 1);
     }
-    
+
   }
+
   .uploadPictures {
-      margin-top: 29rpx;
-      margin-bottom: 242rpx;
+    margin-top: 29rpx;
+    margin-bottom: 242rpx;
+
     ul {
       li {
         width: 196rpx;
@@ -331,6 +470,7 @@
         float: left;
         margin-right: 30rpx;
         margin-bottom: 30rpx;
+
         img {
           width: 100%;
           height: 100%;
@@ -340,38 +480,44 @@
           width: 100%;
           height: 100%;
           background: rgba(244, 244, 244, 1);
-          >img{
-              width: 50rpx;
-              height: 50rpx;
+
+          >img {
+            width: 50rpx;
+            height: 50rpx;
           }
         }
       }
     }
   }
+
   .detail {
     width: 184rpx;
     height: 54rpx;
     border-radius: 27rpx;
     border: 1rpx solid rgba(197, 197, 199, 1);
-    margin-top: 39rpx;
-    margin-bottom: 29rpx;
-    >span{
-        font-size:27rpx;
-        font-family:PingFangSC-Regular;
-        font-weight:400;
-        color:rgba(197,197,199,1);
-        margin-right: 18rpx;
+    margin: 39rpx auto 29rpx;
+
+    >span {
+      font-size: 27rpx;
+      font-family: PingFangSC-Regular;
+      font-weight: 400;
+      color: rgba(197, 197, 199, 1);
+      margin-right: 18rpx;
     }
-    >img{
-        width: 20rpx;
-        height: 20rpx;
+
+    >img {
+      width: 20rpx;
+      height: 20rpx;
     }
   }
-  .confirmBtn {
-    width: 670rpx;
-    //   margin-top: 362rpx;
+
+  .btn {
     position: fixed;
     bottom: 54rpx;
+    width: 100%;
+    .confirmBtn {
+      width: 670rpx;
+    }
   }
 }
 </style>

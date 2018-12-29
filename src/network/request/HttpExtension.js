@@ -22,6 +22,7 @@ import {dataCache} from '../cache/cache'
  * @returns {value \ promise} 返回的值如果从缓存中取到数据就直接换行数据，或则返回promise对象
  */
 const fetchData = (isCache, requestType) => (url, params, isLoading, source, callback) => {
+  params.timestamp = (Date.parse(new Date()) / 1000);//增加时间戳
   switch (source) {
     case ApiSource.XIAMIMUSIC:
       url = `${XIAMI_URL}${url}`
