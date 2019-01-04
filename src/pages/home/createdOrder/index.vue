@@ -257,10 +257,9 @@
             type: "idcard",
             ...publicParams,
           };
+          params.timestamp = (Date.parse(new Date()) / 1000);//增加时间戳
           params.sign = getSign(params);
           return {
-            // openid: this.globalData.openId,
-            // file: this.currentUploadImg,
             url: API_URL,
             filePath: this.currentUploadImg,
             name: "file",
@@ -419,6 +418,7 @@
 .createdOrderPage {
   width: 100%;
   height: 100%;
+  overflow-x: hidden;
   overflow-y: scroll;
   -webkit-overflow-ing: touch;
 
