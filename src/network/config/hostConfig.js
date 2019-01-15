@@ -34,7 +34,7 @@ const host = {
     envVersion: 'develop'
   },
   prd: {
-    API_URL: 'https://zxjapi.zhidekan.me/index/index',
+    API_URL: 'http://api.smarlife.cn',
     XIAMI_URL: '',
     MSITE_URL: '',
     VENILOG_URL: '',
