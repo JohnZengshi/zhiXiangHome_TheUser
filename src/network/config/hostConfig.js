@@ -34,7 +34,7 @@ const host = {
     envVersion: 'develop'
   },
   prd: {
-    API_URL: 'http://api.smarlife.cn',
+    API_URL: 'https://api.smarlife.cn',
     XIAMI_URL: '',
     MSITE_URL: '',
     VENILOG_URL: '',
