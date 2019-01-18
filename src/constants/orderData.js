@@ -45,11 +45,12 @@ let tabsList = [{
     id: "-1",
     dataList: [],
     btnList: btnList.filter((val) => {
-      return val.id == '0'
+      return val.id == '0' || val.id == '4' || val.id == '7'
     }),
     updataTag: true, //限制滑动是否可以刷新数据
     status: "",
-  }, {
+  }, 
+  {
     text: "待接单",
     id: "0",
     dataList: [],

@@ -276,6 +276,25 @@
               return v.id == "7" //首次追加评价
             }
           });
+        }else if(currentIndex == '0'){
+          return btnList.filter((v)=>{
+            if(val.work_order_status == -1){
+            }else if(val.work_order_status == 0){
+              return v.id == '0'
+            }else if(val.work_order_status == 1){
+              return v.id == '0'
+            }else if(val.work_order_status == 2){
+              return v.id == '0'
+            }else if(val.work_order_status == 3){
+              return v.id == '0'
+            }else if(val.work_order_status == 4){
+              
+            }else if(val.work_order_status == -2){
+              
+            }else if(val.work_order_status == -3){
+              
+            }
+          })
         }else{
           return btnList
         }

@@ -68,7 +68,8 @@
         })()
       }
     },
-    onLoad() {
+    onLoad() {},
+    onShow() {
       this.getRegions(); //获取地址列表
       (async () => {
         let loginRES = await login();
@@ -112,7 +113,6 @@
 
         console.log(this.globalData);
       })();
-      
     },
     created() {
       console.log("app created and cache logs by setStorageSync");
