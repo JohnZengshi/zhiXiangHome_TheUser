@@ -128,6 +128,10 @@ const getUserAddressDetail = (params = {}) => {
   return postFetch('', Object.assign(params, publicParams), true);
 }
 
+const getWebDetail = params => { //获取官网信息
+  params.method = 'getWebDetail';
+  return postFetch('', Object.assign(params, publicParams), true);
+}
 export {
   getThirdOpenid,
   authorized,
@@ -150,4 +154,5 @@ export {
   updateUserAddress,
   delUserAddress,
   getUserAddressDetail,
+  getWebDetail
 }
