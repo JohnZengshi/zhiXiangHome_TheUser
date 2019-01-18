@@ -17,26 +17,38 @@
   </div>
 </template>
 <script>
+  import {getWebDetail} from "@/network/api"
   export default {
     data() {
       return {
-        detail: [{
-          title: "电话：",
-          value: "1234567890"
-        }, {
-          title: "邮箱：",
-          value: "xxxxxxx@qq.com"
-        }, {
-          title: "网址：",
-          value: "www.xxxxxxxx.com"
-        }, {
-          title: "详细地址：",
-          value: "广东省深圳市南山区南山街道南山校区32栋3单元204室",
-          noLine: true,
-        }, ]
+        webDetail: {},
       }
     },
-
+    computed: {
+      detail(){
+        return [{
+          title: "版权信息：",
+          value: this.webDetail.copyright
+        }, {
+          title: "备案号：",
+          value: this.webDetail.icp
+        }, {
+          title: "电话：",
+          value: this.webDetail.hot_line
+        }, {
+          title: "详细地址：",
+          value:  this.webDetail.address,
+          noLine: true,
+        }, 
+        ]
+      }
+    },
+    mounted() {
+      ;(async()=>{
+        let res = await getWebDetail({});
+        this.webDetail = res.detail
+      })()
+    },
   }
 </script>
 <style lang="less" scoped>
